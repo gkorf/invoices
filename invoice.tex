@@ -7,7 +7,7 @@
 \usepackage{tabu}
 \usepackage{numprint}
 \makeatletter
-\def\usermacro#1{\euro\,\numprint{\zap@space #1 \@empty}}
+\def\usermacro#1{\numprint{\zap@space #1 \@empty}\,\euro}
 \makeatother
 \tabulinesep=0.1cm
 
@@ -71,7 +71,7 @@ ItalicFont={DejaVu Sans Oblique}]{DejaVu Sans}
 \hline
 \multirow{3}{*}{Ολογράφως} & \multirow{3}{6cm}{{{NUMBERTEXT}}}  
 & Αξία: & {{VALUE}} \\
- & & ΦΠΑ \numprint{{{VATRATE}}}\%: & \euro\,\numprint{{{VAT}}} \\
+ & & ΦΠΑ \numprint{{{VATRATE}}}\%: & \numprint{{{VAT}}}\,\euro \\
  & & Σύνολο: & {{TOTAL}} \\
 \hline
 \end{tabu}
