@@ -271,116 +271,120 @@ parser.add_argument('-b', '--build', dest='build',
                     action='store_true', default=False,
                     help='build pdf from TeX file')
 
-args = parser.parse_args()
+def main():
+    args = parser.parse_args()
 
-tree = ET.parse(args.invoice_data)
-root = tree.getroot()
+    tree = ET.parse(args.invoice_data)
+    root = tree.getroot()
 
-num = root.find('num').text
-date = root.find('date').text
-stamp = root.find('stamp').text
-client = root.find('client').text
-occupation = root.find('occupation').text
-taxoffice = root.find('taxoffice').text
-address = root.find('address').text
-taxnumber = root.find('taxnumber').text
-description = root.find('description').text
-comment = root.find('comment').text
-withholding = root.find('withholding').text
-value_f = float(root.find('value').text)
-uni_rate_el = root.find('uni_rate')
-vat_rate_el = root.find('vat_rate')
-if vat_rate_el is not None:
-    vat_rate = vat_rate_el.text
-else:
-    vat_rate = "0.24" # default value
-vat_rate_f = float(vat_rate)
-vat_rate_prc = make_percentage(vat_rate_f)
-if uni_rate_el is not None:
-    uni_rate = uni_rate_el.text
-else:
-    uni_rate = '0.07'
-uni_rate_f = float(uni_rate)
-uni_rate_prc = make_percentage(uni_rate_f)
+    num = root.find('num').text
+    date = root.find('date').text
+    stamp = root.find('stamp').text
+    client = root.find('client').text
+    occupation = root.find('occupation').text
+    taxoffice = root.find('taxoffice').text
+    address = root.find('address').text
+    taxnumber = root.find('taxnumber').text
+    description = root.find('description').text
+    comment = root.find('comment').text
+    withholding = root.find('withholding').text
+    value_f = float(root.find('value').text)
+    uni_rate_el = root.find('uni_rate')
+    vat_rate_el = root.find('vat_rate')
+    if vat_rate_el is not None:
+        vat_rate = vat_rate_el.text
+    else:
+        vat_rate = "0.24" # default value
+    vat_rate_f = float(vat_rate)
+    vat_rate_prc = make_percentage(vat_rate_f)
+    if uni_rate_el is not None:
+        uni_rate = uni_rate_el.text
+    else:
+        uni_rate = '0.07'
+    uni_rate_f = float(uni_rate)
+    uni_rate_prc = make_percentage(uni_rate_f)
 
-value = "{:.2f}".format(value_f)
-vat_element = root.find('vat')
-if vat_element is not None:
-    vat_f = float(vat_element.text)
-else:
-    vat_f = value_f * vat_rate_f
-total_f = value_f + vat_f
-vat = "{:.2f}".format(vat_f)
-total = "{:.2f}".format(total_f) 
-(intpart, floatpart) = total.split('.')
+    value = "{:.2f}".format(value_f)
+    vat_element = root.find('vat')
+    if vat_element is not None:
+        vat_f = float(vat_element.text)
+    else:
+        vat_f = value_f * vat_rate_f
+    total_f = value_f + vat_f
+    vat = "{:.2f}".format(vat_f)
+    total = "{:.2f}".format(total_f) 
+    (intpart, floatpart) = total.split('.')
 
-numbertext = "{0} ευρώ".format(num_to_text(int(intpart)))
+    numbertext = "{0} ευρώ".format(num_to_text(int(intpart)))
 
-uni_f = value_f * uni_rate_f
-uni = "{:.2f}".format(uni_f) 
+    uni_f = value_f * uni_rate_f
+    uni = "{:.2f}".format(uni_f) 
 
-if args.english:
-    numbertext_en = "{0} euros".format(num_to_text(int(intpart), True))
-else:
-    numbertext_en = ""
-    
-if floatpart != '' :
-    floatpart_i = int(floatpart)
-    if floatpart_i > 0:
-        if floatpart_i > 1:
-            dec_desc = 'λεπτά'
-        else:
-            dec_desc = 'λεπτό'
-        numbertext = "{0} και {1} {2}".format(numbertext,
-                                              num_to_text(int(floatpart)),
-                                              dec_desc)
-        if args.english:
+    if args.english:
+        numbertext_en = "{0} euros".format(num_to_text(int(intpart), True))
+    else:
+        numbertext_en = ""
+
+    if floatpart != '' :
+        floatpart_i = int(floatpart)
+        if floatpart_i > 0:
             if floatpart_i > 1:
-                dec_desc = 'cents'
+                dec_desc = 'λεπτά'
             else:
-                dec_desc = 'cent'            
-            numbertext_en = "{0} and {1} {2}".format(numbertext_en,
-                                                     num_to_text(
-                                                         int(floatpart),
-                                                         True),
-                                                     dec_desc)
+                dec_desc = 'λεπτό'
+            numbertext = "{0} και {1} {2}".format(numbertext,
+                                                  num_to_text(int(floatpart)),
+                                                  dec_desc)
+            if args.english:
+                if floatpart_i > 1:
+                    dec_desc = 'cents'
+                else:
+                    dec_desc = 'cent'            
+                numbertext_en = "{0} and {1} {2}".format(numbertext_en,
+                                                         num_to_text(
+                                                             int(floatpart),
+                                                             True),
+                                                         dec_desc)
 
-outfn_prefix = 'invoice_%03d' % int(num)
-outfn_dir = outfn_prefix + '_build'
-os.makedirs(outfn_dir)
-outfn = outfn_prefix + '.tex'
-outfn_path = os.path.join(outfn_dir, outfn)
+    outfn_prefix = 'invoice_%03d' % int(num)
+    outfn_dir = outfn_prefix + '_build'
+    os.makedirs(outfn_dir)
+    outfn = outfn_prefix + '.tex'
+    outfn_path = os.path.join(outfn_dir, outfn)
 
-with codecs.open(args.template, mode='r', encoding='utf-8') as inf:
-    with codecs.open(outfn_path, mode='w', encoding='utf-8') as outf:
-        for line in inf:
-            line = line.replace("{{NUM}}", num)
-            line = line.replace("{{DATE}}", date)
-            line = line.replace("{{STAMP}}", stamp)
-            line = line.replace("{{CLIENT}}", client)
-            line = line.replace("{{OCCUPATION}}", occupation)
-            line = line.replace("{{TAXOFFICE}}", taxoffice)
-            line = line.replace("{{ADDRESS}}", address)
-            line = line.replace("{{TAXNUMBER}}", taxnumber)
-            line = line.replace("{{DESCRIPTION}}", description)
-            line = line.replace("{{VALUE}}", value)
-            line = line.replace("{{COMMENT}}", comment)
-            line = line.replace("{{WITHHOLDING}}", withholding)
-            line = line.replace("{{VATRATE}}", vat_rate_prc)
-            line = line.replace("{{VAT}}", vat)
-            line = line.replace("{{TOTAL}}", total)
-            line = line.replace("{{NUMBERTEXT}}",
-                                numbertext.decode('utf-8').capitalize())
-            line = line.replace("{{NUMBERTEXTEN}}",
-                                numbertext_en.decode('utf-8').capitalize())
-            line = line.replace("{{UNIRATE}}", uni_rate_prc)
-            line = line.replace("{{UNI}}", uni)
-                
-            outf.write(line)
+    with codecs.open(args.template, mode='r', encoding='utf-8') as inf:
+        with codecs.open(outfn_path, mode='w', encoding='utf-8') as outf:
+            for line in inf:
+                line = line.replace("{{NUM}}", num)
+                line = line.replace("{{DATE}}", date)
+                line = line.replace("{{STAMP}}", stamp)
+                line = line.replace("{{CLIENT}}", client)
+                line = line.replace("{{OCCUPATION}}", occupation)
+                line = line.replace("{{TAXOFFICE}}", taxoffice)
+                line = line.replace("{{ADDRESS}}", address)
+                line = line.replace("{{TAXNUMBER}}", taxnumber)
+                line = line.replace("{{DESCRIPTION}}", description)
+                line = line.replace("{{VALUE}}", value)
+                line = line.replace("{{COMMENT}}", comment)
+                line = line.replace("{{WITHHOLDING}}", withholding)
+                line = line.replace("{{VATRATE}}", vat_rate_prc)
+                line = line.replace("{{VAT}}", vat)
+                line = line.replace("{{TOTAL}}", total)
+                line = line.replace("{{NUMBERTEXT}}",
+                                    numbertext.decode('utf-8').capitalize())
+                line = line.replace("{{NUMBERTEXTEN}}",
+                                    numbertext_en.decode('utf-8').capitalize())
+                line = line.replace("{{UNIRATE}}", uni_rate_prc)
+                line = line.replace("{{UNI}}", uni)
 
-print "Wrote %s" % outfn
+                outf.write(line)
 
-if args.build:
-    subprocess.call(["xelatex", outfn], cwd=outfn_dir)
-    pdffn = outfn_prefix + ".pdf"
-    print "Wrote pdf file %s" % os.path.join(outfn_dir, pdffn)
+    print "Wrote %s" % outfn
+
+    if args.build:
+        subprocess.call(["xelatex", outfn], cwd=outfn_dir)
+        pdffn = outfn_prefix + ".pdf"
+        print "Wrote pdf file %s" % os.path.join(outfn_dir, pdffn)
+
+if __name__ == "__main__":
+    main()
