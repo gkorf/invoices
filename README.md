@@ -18,6 +18,7 @@ Usage
       -t TEMPLATE, --template TEMPLATE
                             Use TEMPLATE as LaTeX template
       -e, --english         Include English output
+      -b, --build           build pdf from TeX file
 
 where `invoice_data` is an XML file containing the data to be entered in a particular invoice. A LaTeX (in particular, XeLaTeX) file will be produced, which you can typeset and print out.
 

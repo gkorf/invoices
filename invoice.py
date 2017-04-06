@@ -1,10 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import os
 import codecs
 import sys
 import xml.etree.ElementTree as ET
 import argparse
+import subprocess
 
 one_to_twenty_n = [
     'ένα',
@@ -253,15 +255,21 @@ def make_percentage(number):
         percentage = percentage.replace('.00', '')
     return percentage
     
+CURPATH = os.path.dirname(os.path.realpath(__file__))
+default_template = os.path.join(CURPATH, 'invoice.tex')
+
 parser = argparse.ArgumentParser(description='Invoice generator')
 parser.add_argument('invoice_data')
 parser.add_argument('-t', '--template', dest='template',
-                    default='invoice.tex',
+                    default=default_template,
                     help='use TEMPLATE as LaTeX template')
 parser.add_argument('-e', '--english', dest='english',
                     action='store_true',
                     default=False,
                     help='include English output')
+parser.add_argument('-b', '--build', dest='build',
+                    action='store_true', default=False,
+                    help='build pdf from TeX file')
 
 args = parser.parse_args()
 
@@ -337,10 +345,14 @@ if floatpart != '' :
                                                          True),
                                                      dec_desc)
 
-outfn = 'invoice_' + num + '.tex'
+outfn_prefix = 'invoice_%03d' % int(num)
+outfn_dir = outfn_prefix + '_build'
+os.makedirs(outfn_dir)
+outfn = outfn_prefix + '.tex'
+outfn_path = os.path.join(outfn_dir, outfn)
 
 with codecs.open(args.template, mode='r', encoding='utf-8') as inf:
-    with codecs.open(outfn, mode='w', encoding='utf-8') as outf:
+    with codecs.open(outfn_path, mode='w', encoding='utf-8') as outf:
         for line in inf:
             line = line.replace("{{NUM}}", num)
             line = line.replace("{{DATE}}", date)
@@ -366,3 +378,9 @@ with codecs.open(args.template, mode='r', encoding='utf-8') as inf:
                 
             outf.write(line)
 
+print "Wrote %s" % outfn
+
+if args.build:
+    subprocess.call(["xelatex", outfn], cwd=outfn_dir)
+    pdffn = outfn_prefix + ".pdf"
+    print "Wrote pdf file %s" % os.path.join(outfn_dir, pdffn)
