@@ -256,12 +256,12 @@ def make_percentage(number):
     return percentage
     
 CURPATH = os.path.dirname(os.path.realpath(__file__))
-default_template = os.path.join(CURPATH, 'invoice.tex')
+greek_template = os.path.join(CURPATH, 'invoice.tex')
+english_template = os.path.join(CURPATH, 'invoice_en.tex')
 
 parser = argparse.ArgumentParser(description='Invoice generator')
 parser.add_argument('invoice_data')
 parser.add_argument('-t', '--template', dest='template',
-                    default=default_template,
                     help='use TEMPLATE as LaTeX template')
 parser.add_argument('-e', '--english', dest='english',
                     action='store_true',
@@ -273,6 +273,11 @@ parser.add_argument('-b', '--build', dest='build',
 
 def main():
     args = parser.parse_args()
+
+    if args.template is not None:
+        template = args.template
+    else:
+        template = english_template if args.english else greek_template
 
     tree = ET.parse(args.invoice_data)
     root = tree.getroot()
@@ -352,7 +357,7 @@ def main():
     outfn = outfn_prefix + '.tex'
     outfn_path = os.path.join(outfn_dir, outfn)
 
-    with codecs.open(args.template, mode='r', encoding='utf-8') as inf:
+    with codecs.open(template, mode='r', encoding='utf-8') as inf:
         with codecs.open(outfn_path, mode='w', encoding='utf-8') as outf:
             for line in inf:
                 line = line.replace("{{NUM}}", num)
