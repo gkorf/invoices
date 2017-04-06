@@ -277,15 +277,10 @@ taxoffice = root.find('taxoffice').text
 address = root.find('address').text
 taxnumber = root.find('taxnumber').text
 description = root.find('description').text
+comment = root.find('comment').text
+withholding = root.find('withholding').text
 value_f = float(root.find('value').text)
-tax_rate_el = root.find('tax_rate')
 uni_rate_el = root.find('uni_rate')
-if tax_rate_el is not None:
-    tax_rate = tax_rate_el.text
-else:
-    tax_rate = "0.20" # default value
-tax_rate_f = float(tax_rate)
-tax_rate_prc = make_percentage(tax_rate_f)
 vat_rate_el = root.find('vat_rate')
 if vat_rate_el is not None:
     vat_rate = vat_rate_el.text
@@ -301,14 +296,12 @@ uni_rate_f = float(uni_rate)
 uni_rate_prc = make_percentage(uni_rate_f)
 
 value = "{:.2f}".format(value_f)
-tax_f = value_f * tax_rate_f
 vat_element = root.find('vat')
 if vat_element is not None:
     vat_f = float(vat_element.text)
 else:
     vat_f = value_f * vat_rate_f
 total_f = value_f + vat_f
-tax = "{:.2f}".format(tax_f)
 vat = "{:.2f}".format(vat_f)
 total = "{:.2f}".format(total_f) 
 (intpart, floatpart) = total.split('.')
@@ -345,7 +338,7 @@ if floatpart != '' :
                                                      dec_desc)
 
 outfn = 'invoice_' + num + '.tex'
-  
+
 with codecs.open(args.template, mode='r', encoding='utf-8') as inf:
     with codecs.open(outfn, mode='w', encoding='utf-8') as outf:
         for line in inf:
@@ -359,8 +352,8 @@ with codecs.open(args.template, mode='r', encoding='utf-8') as inf:
             line = line.replace("{{TAXNUMBER}}", taxnumber)
             line = line.replace("{{DESCRIPTION}}", description)
             line = line.replace("{{VALUE}}", value)
-            line = line.replace("{{TAXRATE}}", tax_rate_prc)
-            line = line.replace("{{TAX}}", tax)
+            line = line.replace("{{COMMENT}}", comment)
+            line = line.replace("{{WITHHOLDING}}", withholding)
             line = line.replace("{{VATRATE}}", vat_rate_prc)
             line = line.replace("{{VAT}}", vat)
             line = line.replace("{{TOTAL}}", total)
