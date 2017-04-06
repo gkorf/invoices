@@ -171,7 +171,7 @@ def num_to_text_hundreds(number, f, english=False):
         hundreds_arr_n = hundreds_n
         tens_arr = tens
     if h > 0:
-        if h == 1 and mod100 > 0 and english:
+        if h == 1 and mod100 > 0 and not english:
             parts.append(hundreds_arr_n[h - 1] + 'ν')
         else:
             if f == True:
