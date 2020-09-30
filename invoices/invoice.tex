@@ -4,12 +4,9 @@
 
 \usepackage[framemethod=TikZ]{mdframed}
 
-\usepackage{tabu}
+\usepackage{tabularx}
 \usepackage{numprint}
-\makeatletter
-\def\usermacro#1{\numprint{\zap@space #1 \@empty}\,\euro}
-\makeatother
-\tabulinesep=0.1cm
+\newcommand{\fmoney}[1]{\numprint{#1}\,\euro}
 
 \thispagestyle{empty}
 % DOCUMENT LAYOUT
@@ -20,6 +17,8 @@
 \usepackage{eurosym}
 \usepackage{xunicode}
 \usepackage{xltxtra}
+
+\renewcommand{\arraystretch}{1.2}
 
 \defaultfontfeatures{Mapping=tex-text} 
 \setromanfont [Ligatures={Common},
@@ -56,26 +55,34 @@ ItalicFont={DejaVu Sans Oblique}]{DejaVu Sans}
 ΑΦΜ: {{TAXNUMBER}}\quad ΔΟΥ: {{TAXOFFICE}}\\ [0.1cm]
 
 \vspace{0.4cm}
-\begin{tabu} to \textwidth {|X[4]|>{\tabudecimal \usermacro}X[r]|}
+\begin{tabularx}{\textwidth}{
+    |>{\hsize=1.6\hsize\linewidth=\hsize}X
+    |>{\hsize=.4\hsize\linewidth=\hsize\raggedleft\arraybackslash}X|
+  }
+
   \hline
   \begin{center}ΑΙΤΙΟΛΟΓΙΑ---ΠΕΡΙΓΡΑΦΗ \end{center}& \begin{center}ΑΞΙΑ\end{center}\\
   \hline 
-  {{DESCRIPTION}} & {{VALUE}}\\ 
-  \vspace{5cm} & \\
+  {{DESCRIPTION}} & \fmoney{{{VALUE}}}\\[3cm]
   {{COMMENT}} & \\
   {{WITHHOLDING}} & \\
   \hline
-\end{tabu}
+\end{tabularx}
 
 \vspace{1cm}
-\begin{tabu} to \textwidth {|X[1]|X[3]|X[1.1]|>{\tabudecimal \usermacro}X[r]|}
+\begin{tabularx}{\textwidth}{
+    |>{\hsize=.5\hsize\linewidth=\hsize}X
+    |>{\hsize=1.5\hsize\linewidth=\hsize}X
+    |>{\hsize=.6\hsize\linewidth=\hsize}X
+    |>{\hsize=.4\hsize\linewidth=\hsize\raggedleft\arraybackslash}X|
+  }
 \hline
 \multirow{3}{*}{Ολογράφως} & \multirow{3}{6cm}{{{NUMBERTEXT}}}  
-& Αξία: & {{VALUE}} \\
- & & ΦΠΑ \numprint{{{VATRATE}}}\%: & \numprint{{{VAT}}}\,\euro \\
- & & Σύνολο: & {{TOTAL}} \\
+& Αξία: & \fmoney{{{VALUE}}} \\
+ & & ΦΠΑ \numprint{{{VATRATE}}}\%: & \fmoney{{{VAT}}} \\
+ & & Σύνολο: & \fmoney{{{TOTAL}}} \\
 \hline
-\end{tabu}
+\end{tabularx}
 
 \vspace{\fill}
 \begin{center}
